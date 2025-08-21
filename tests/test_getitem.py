@@ -54,6 +54,14 @@ def test_slice_str_range(array):
     result = array["ap":"le":]
     assert result.data == ["app"]
 
+def test_slice_int_step(array):
+    result = array[::2]
+    assert result.data == ["ape"]
+
+def test_slice_str_step(array):
+    result = array[::","]
+    assert result.data == ["apple"]
+
 def test_slice_int_with_step(array):
     result = array[1:3:2]
     assert result.data == ["p"]

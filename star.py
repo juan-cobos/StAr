@@ -60,24 +60,21 @@ class Array:
                         return Array([items.start + m.group(1)]) if m else Array([])
 
                     case None, int(), None: # [: int:]
-                        return  Array([self.data[axis][:items.stop]])
+                        return Array([self.data[axis][:items.stop]])
 
                     case None, str(), None: # [: str:]
                         m = re.search(r"(.*?)" + re.escape(items.stop), self.data[axis])
                         return Array([m.group(1)]) if m else Array([])
                     
                     case None, None, int(): # [::int]
-                        # TODO: implement just step with int
-                        ...
-                        #return  Array([self.data[axis][:items.stop]])
+                        return Array([self.data[axis][::items.step]])
 
                     case None, None, str(): # [::str]
-                        # TODO: implement just step with int
-                        ...
-                        # return Array([m.group(1)]) if m else Array([])
+                        # TODO: decide whether to return [] or [""]
+                        return Array(["".join(self.data[axis].split(items.step))])
 
                     case int(), int(), None: # [int: int:]
-                        return  Array([self.data[axis][items.start: items.stop]])
+                        return Array([self.data[axis][items.start: items.stop]])
 
                     case str(), str(), None: # [str: str:]
                         pattern = re.escape(items.start) + r"(.*?)" + re.escape(items.stop)
@@ -85,7 +82,7 @@ class Array:
                         return Array([items.start + m.group(1)]) if m else Array([])
 
                     case int(), int(), int(): # [int: int: int]
-                        return  Array([self.data[axis][items.start: items.stop: items.step]])
+                        return Array([self.data[axis][items.start: items.stop: items.step]])
 
                     case str(), str(), int():  # [str: str: int]
                         pattern = re.escape(items.start) + r"(.*?)" + re.escape(items.stop)
