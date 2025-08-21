@@ -6,7 +6,7 @@ Tired of manually splitting or using complicated regular expressions?
 Now you can transform strings as if they were arrays!
 
 ---
-***StAr** stands for *"String Array"*, inspired by NumPy array indexing and the Kleene star.*
+****StAr** stands for *"String Array"*, inspired by NumPy array indexing and the Kleene star.*
 
 ## ✂️ String slicing made easy
 

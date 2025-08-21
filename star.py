@@ -81,6 +81,13 @@ class Array:
                         m = re.search(pattern, self.data[axis])
                         return Array([items.start + m.group(1)]) if m else Array([])
 
+                    case int(), None, int(): # [int:: int]
+                        # TODO: implement this
+                        ...
+                    case str(), None, str(): # [str:: str]
+                        # TODO: implement this
+                        ...
+
                     case int(), int(), int(): # [int: int: int]
                         return Array([self.data[axis][items.start: items.stop: items.step]])
 
@@ -112,6 +119,55 @@ class Array:
             case _:
                 return SyntaxError
 
-    def __setitem__(self, x: str):
-        ...
+    def __setitem__(self, key, value, axis=0):
 
+        match key:
+
+            case int():
+                self.data[key] = value
+
+            case str():
+                self.data[axis].replace(key, value)
+
+            case slice():
+
+                match key.start, key.stop, key.step:
+
+                    case int(), None, None:  # [int:]
+                        self.data[:key] += str(value)
+
+                    case str(), None, None:  # [str:]
+                        # Match index string and append value at the end
+                        m = re.search(re.escape(key.start) + r"(.*)", self.data[0])
+                        self.data[axis] = self.data[0][:m.start] + value
+
+                    case None, int(), None:  # [: int:]
+                        self.data[:key] = str(value)
+
+                    case None, str(), None:  # [: str:]
+                        # Match stop index and store value + the end of data
+                        m = re.search(r"(.*?)" + re.escape(key.stop), self.data[axis])
+                        self.data[0] = value + self.data[0][m.stop:]
+
+                    case None, None, int():  # [::int]
+                        out = ""
+                        for i in range(len(self.data[axis])):
+                            out += self.data[axis][i] if i % key.step else value
+                        self.data[axis] = out
+
+                    case None, None, str():  # [::str]
+                        # TODO: check if this pattern matching works, otherwise try with re.split()
+                        pattern = f"(?!{re.escape(key.step)})"
+                        self.data[axis] = re.sub(pattern + ".", value, self.data[axis])
+
+                    case int(), int(), None:  # [int: int:]
+                        self.data[axis] = self.data[axis][:key.start] + value + self.data[axis][key.stop]
+
+                    case str(), str(), None:  # [str: str:]
+                        ...
+                    case int(), int(), int():  # [int: int: int]
+                        ...
+                    case str(), str(), int():  # [str: str: int]
+                        ...
+                    case str(), str(), str():  # [str: str: str]
+                        ...
