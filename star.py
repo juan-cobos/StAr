@@ -164,10 +164,34 @@ class Array:
                         self.data[axis] = self.data[axis][:key.start] + value + self.data[axis][key.stop]
 
                     case str(), str(), None:  # [str: str:]
-                        ...
+                        pattern = re.escape(key.start) + r"(.*?)" + re.escape(key.stop)
+                        m = re.search(pattern, self.data[axis])
+                        # TODO: decide what should be assigned in case of non-match string
+                        self.data[axis] = self.data[axis][:m.start()] + value + key.stop if m else ""
+
                     case int(), int(), int():  # [int: int: int]
-                        ...
+                        out = self.data[axis][:key.start]
+                        for i in range(key.start, key.stop):
+                            out += self.data[axis][i] if i % key.step else value
+                        self.data[axis] = out
+
                     case str(), str(), int():  # [str: str: int]
-                        ...
+                        out = self.data[axis][:key.start]
+                        pattern = re.escape(key.start) + r"(.*?)" + re.escape(key.stop)
+                        m = re.search(pattern, self.data[axis])
+                        if m:
+                            for i in range(m.start(), m.stop()):
+                                out += self.data[axis][i] if i % key.step else value
+                            self.data[axis] = out
+                        else:
+                            self.data[axis] = ""
+
                     case str(), str(), str():  # [str: str: str]
-                        ...
+                        pattern = re.escape(key.start) + r"(.*?)" + re.escape(key.stop)
+                        m = re.search(pattern, self.data[axis])
+                        if m:
+                            out = self.data[axis][: m.start()]
+                            out += (key.start + m.group(1)).replace(key.step, value) + key.stop
+                            self.data[axis] = out
+                        else:
+                            self.data[axis] = ""
